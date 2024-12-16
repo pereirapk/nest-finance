@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { StockService } from '../service/stock.service';
 import { StockDto } from '../dto/stock.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 
 
@@ -12,6 +13,8 @@ export class StockController {
   async getStockPrice(@Query('symbol') symbol: string): Promise<any> {
     return this.stockService.getStockPrice(symbol);
   }
+
+  @UseGuards(JwtAuthGuard)
   @Post('save')
   async create(@Body() stockDto: StockDto): Promise<any> {
     return this.stockService.create(stockDto);

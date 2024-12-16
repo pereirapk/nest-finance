@@ -10,7 +10,9 @@ import { AuthService } from '../services/auth.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { UsersService } from '../../users/services/users.service';
+import { IsPublic } from '../decorators/is-public.decorator';
 
+@IsPublic()
 @Controller('auth')
 export class AuthController {
   constructor(

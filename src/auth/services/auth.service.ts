@@ -27,7 +27,6 @@ export class AuthService {
     const token = this._createToken(loginUserDto);
     return {
       ...token,
-      data: user,
     };
   }
   private _createToken(user: any): any {
