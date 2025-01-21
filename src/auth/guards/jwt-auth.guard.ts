@@ -13,34 +13,23 @@ import {
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-    constructor(private reflector: Reflector) {
-        super();
-      }
-    
-      canActivate(context: ExecutionContext): Promise<boolean> | boolean {
-        const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-          context.getHandler(),
-          context.getClass(),
-        ]);
-    
-        if (isPublic) {
-          return true;
-        }
-    
-        const canActivate = super.canActivate(context);
-    
-        if (typeof canActivate === 'boolean') {
-          return canActivate;
-        }
-    
-        const canActivatePromise = canActivate as Promise<boolean>;
-    
-        return canActivatePromise.catch((error) => {
-          if (error instanceof UnauthorizedError) {
-            throw new UnauthorizedException(error.message);
-          }
-    
-          throw new UnauthorizedException();
-        });
-      }
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Aguarda a resolução do método base
+    const isAuthorized = await super.canActivate(context);
+    console.log(isAuthorized)
+    if (!isAuthorized) {
+      throw new UnauthorizedException('Token is invalid or missing');
+    }
+
+    // Adicione validações adicionais aqui (opcional)
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    console.log(user);
+
+    if (!user) {
+      throw new UnauthorizedException('User is not active');
+    }
+
+    return true; // Permite o acesso à rota protegida
+  }
 }
