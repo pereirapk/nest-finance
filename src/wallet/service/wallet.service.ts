@@ -75,7 +75,7 @@ export class WalletService {
           userId: query.userId,
           stocks: [
             {
-              stockId: query.userId,
+              stockId: stockId,
               quantity: quantity,
               note: note,
             },
@@ -122,5 +122,7 @@ export class WalletService {
       return null;
     }
     return wallet;
+  }
+  async deleteStockfromWallet(stockId: ObjectId, walletId: ObjectId): Promise<any> {
   }
 }

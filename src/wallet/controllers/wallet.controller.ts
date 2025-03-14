@@ -1,11 +1,11 @@
-import { CreateUserDto } from './../../users/dto/create-user.dto';
+
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { WalletService } from '../service/wallet.service';
@@ -15,7 +15,6 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ObjectId } from 'mongodb';
 import { CurrentUser } from 'src/users/decorator/currentUser.decorator';
 import { StockService } from 'src/stock/service/stock.service';
-import { query } from 'express';
 @Controller('wallet')
 export class WalletController {
   private stock: any;
@@ -42,17 +41,15 @@ export class WalletController {
       });
       const walletUser = await this.walletService.getByUser(user.id);
       let newStocks = [];
-      const userStocks = walletUser?.stock ?? [];
-      if (userStocks.some((a) => a.id === stockInput.id)) {
-      console.log("Estou atualizando um item")
-      console.log({stockInput})
+      const userStocks = walletUser?.stocks ?? [];
+      if (userStocks.some((a) => a.stockId.equals(stockInput.id))) {
 
-        newStocks = walletUser.stock.reduce(
+        newStocks = userStocks.reduce(
           (acc: WalletDto['stock'], stock) => {
-            if (stock.id === stockInput.id) {
+            if (stock.stockId.equals(stockInput.id)) {
               acc.push({
                 stockId: stockInput.id,
-                quantity: stockInput.quantity + walletDtoController.quantity,
+                quantity: (Number.isNaN(stock.quantity)? 0 : stock.quantity) + (walletDtoController?.quantity ?? 0),
                 note: walletDtoController.note,
               });
             } else {
@@ -63,9 +60,6 @@ export class WalletController {
           [],
         );
       } else {
-        //tenho que adicionar
-        console.log("Estou adicionando um item novo")
-
         newStocks = [
           ...(walletUser?.stock || []),
           {
@@ -90,4 +84,11 @@ export class WalletController {
   async findByUserId(@Query('userId') userId: ObjectId): Promise<any> {
     return this.walletService.getByUser(userId);
   }
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async delete(@Query('id') id: ObjectId): Promise<any> {
+    const walletId = new ObjectId();
+    return this.walletService.deleteStockfromWallet(id,walletId);
+  }
+
 }
