@@ -16,7 +16,7 @@ export class StockController {
 
   @UseGuards(JwtAuthGuard)
   @Post('save')
-  async create(@Body() stockDto: StockDto): Promise<any> {
-    return this.stockService.create(stockDto);
+  async save(@Body() stockDto: StockDto): Promise<any> {
+    return this.stockService.save(stockDto);
   }
 }

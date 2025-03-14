@@ -43,7 +43,6 @@ export class UsersService {
     }
   }
 
-
   async findByEmail(email: string): Promise<any> {
     const user =  this.usersCollection.findOne({ email });
 
@@ -53,7 +52,6 @@ export class UsersService {
 
     return user;
   }
-  //not complete update password
   async updatePassword(email: string, UpdatePasswordDto: UpdatePasswordDto): Promise<any> {
       const user = await this.findByEmail(email);
       if(!user) {

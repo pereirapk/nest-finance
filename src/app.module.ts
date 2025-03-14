@@ -12,7 +12,7 @@ import { JwtStrategy } from './auth/strategies/jwt.strategy';
       ConfigModule.forRoot(),
       StockModule,
       AuthModule,
-      WalletModule
+      WalletModule,
     ],
     providers: [
       {

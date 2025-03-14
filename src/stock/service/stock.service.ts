@@ -2,6 +2,7 @@ import { Injectable, Inject, HttpException, HttpStatus, InternalServerErrorExcep
 import axios from 'axios';
 import { MongoClient } from 'mongodb';
 import { StockDto } from '../dto/stock.dto';
+import { NotFoundException } from '@nestjs/common';
 
 
 @Injectable()
@@ -44,9 +45,23 @@ export class StockService {
       );
     }
   }
-  async create(stockDto: StockDto): Promise<any> {
+  async getStock(query:Partial<StockDto>): Promise<any> {
+    const stock = await this.stocksCollection.findOne(query);
+
+    if (!stock) {
+      throw new NotFoundException('Ação não encontrada');
+    }
+    return { id: stock._id, ...stock};
+  }
+  async save(stockDto: StockDto) {
     try {
-      const stock = await this.stocksCollection.insertOne(stockDto);
+
+      /*updateOne {Search, Input, upsert}*/
+      const stock = await this.stocksCollection.updateOne(
+        { symbol: stockDto.symbol},
+        { $set: stockDto},
+        { upsert: true }
+        );
       if (stock.acknowledged === false) {
         throw new ConflictException('Ação não pode ser criada');
       }
@@ -54,14 +69,15 @@ export class StockService {
         statusCode: HttpStatus.CREATED,
         message: 'Ação criada com sucesso',
         data: {
-          symbol: stockDto.symbol,
-          price: stockDto.price,
-          type: stockDto.type,
-          note: stockDto.note,
+          id: stock._id,
+          symbol: stock.symbol,
+          price: stock.price,
+          type: stock.type,
         },
       };
     } catch (error) {
         throw new InternalServerErrorException('Ação não pode ser criada');
     }
   };
+
 }

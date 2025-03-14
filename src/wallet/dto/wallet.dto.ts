@@ -1,16 +1,30 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsInt, Min, Max } from 'class-validator';
 import { IsObjectId } from '../../common/decorators/is-object-id.decorator';
+import { ObjectId } from 'mongodb';
 
 
 export class WalletDto {    
     @IsNotEmpty()
     @IsObjectId()
-    id_user: number;
+    userId: ObjectId;
+
+
+    stock: {
+        stockId: ObjectId,
+        quantity: number,
+        note: number
+    }[]
 
     @IsNotEmpty()
     @IsObjectId()
-    id_stock: number;
+    stockId: ObjectId;
 
     @IsNotEmpty()
     quantity: number;
+
+    @IsNotEmpty({ message: 'O campo de quantidade não pode estar vazio' })
+    @IsInt({ message: 'O campo deve ser um número inteiro'})
+    @Min(1, { message: 'O campo deve ser maior que 1' })
+    @Max(10, { message: 'O campo deve ser menor que 10' })
+    note: number;
 }
