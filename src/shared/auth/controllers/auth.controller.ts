@@ -6,8 +6,8 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { CreateUserDto } from '../../users/dto/create-user.dto';
-import { UsersService } from '../../users/services/users.service';
+import { CreateUserDto } from '../../../user/application/dto/create-user.dto';
+import { UsersService } from '../../../user/domain/services/users.service';
 import { IsPublic } from '../decorators/is-public.decorator';
 
 @IsPublic()

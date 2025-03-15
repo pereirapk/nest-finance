@@ -8,13 +8,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { WalletService } from '../service/wallet.service';
-import { WalletDtoController } from '../dto/walletDtoController.dto';
-import { WalletDto } from '../dto/wallet.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { WalletService } from '../../domain/service/wallet.service';
+import { WalletDtoController } from '../../application/dto/walletDtoController.dto';
+import { WalletDto } from '../../application/dto/wallet.dto';
+import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
 import { ObjectId } from 'mongodb';
-import { CurrentUser } from 'src/users/decorator/currentUser.decorator';
-import { StockService } from 'src/stock/service/stock.service';
+import { CurrentUser } from 'src/user/decorator/currentUser.decorator';
+import { StockService } from 'src/stock/domain/service/stock.service';
 @Controller('wallet')
 export class WalletController {
   private stock: any;

@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsInt, Min, Max, IsString } from 'class-validator';
-import { IsObjectId } from '../../common/decorators/is-object-id.decorator';
+import { IsObjectId } from '../../../shared/common/decorators/is-object-id.decorator';
 
 
 export class WalletDtoController {    

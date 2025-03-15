@@ -1,9 +1,9 @@
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdatePasswordDto } from '../dto/update-password.dto';
+import { CreateUserDto } from '../../application/dto/create-user.dto';
+import { UpdatePasswordDto } from '../../application/dto/update-password.dto';
 import { Injectable, Inject, NotFoundException, ConflictException, InternalServerErrorException, HttpStatus } from '@nestjs/common';
 import { MongoClient } from 'mongodb';
 import * as bcrypt from 'bcryptjs';
-import { LoginDto } from 'src/auth/dto/login.dto';
+import { LoginDto } from 'src/shared/auth/dto/login.dto';
 
 
 @Injectable()

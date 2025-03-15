@@ -8,7 +8,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { MongoClient, ObjectId } from 'mongodb';
-import { WalletDto } from '../dto/wallet.dto';
+import { WalletDto } from '../../application/dto/wallet.dto';
 
 @Injectable()
 export class WalletService {

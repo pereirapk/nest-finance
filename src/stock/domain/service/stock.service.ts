@@ -1,7 +1,7 @@
 import { Injectable, Inject, HttpException, HttpStatus, InternalServerErrorException, ConflictException } from '@nestjs/common';
 import axios from 'axios';
 import { MongoClient } from 'mongodb';
-import { StockDto } from '../dto/stock.dto';
+import { StockDto } from '../../application/dto/stock.dto';
 import { NotFoundException } from '@nestjs/common';
 
 
