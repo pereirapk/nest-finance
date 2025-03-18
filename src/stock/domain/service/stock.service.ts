@@ -1,6 +1,6 @@
 import { Injectable, Inject, HttpException, HttpStatus, InternalServerErrorException, ConflictException } from '@nestjs/common';
 import axios from 'axios';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import { StockDto } from '../../application/dto/stock.dto';
 import { NotFoundException } from '@nestjs/common';
 
@@ -79,5 +79,12 @@ export class StockService {
         throw new InternalServerErrorException('Ação não pode ser criada');
     }
   };
+  async delete(stockId: ObjectId): Promise<any> {
+    this.stocksCollection.deleteOne({ _id: stockId });
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Ação deletada com sucesso',
+    }
+  }
 
 }

@@ -124,5 +124,13 @@ export class WalletService {
     return wallet;
   }
   async deleteStockfromWallet(stockId: ObjectId, walletId: ObjectId): Promise<any> {
+    await this.walletsCollection.deleteOne(
+      { _id: walletId },
+      { $pull: { stocks: { stockId: stockId } } }
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Ação removida da carteira',
+    };
   }
 }
