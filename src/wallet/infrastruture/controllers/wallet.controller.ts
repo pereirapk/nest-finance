@@ -8,76 +8,33 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { WalletService } from '../../domain/service/wallet.service';
-import { WalletDtoController } from '../../application/dto/walletDtoController.dto';
+import { WalletService } from '../../domain/services/wallet.service';
 import { WalletDto } from '../../application/dto/wallet.dto';
 import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
 import { ObjectId } from 'mongodb';
 import { CurrentUser } from 'src/user/decorator/currentUser.decorator';
-import { StockService } from 'src/stock/domain/service/stock.service';
+import { StockService } from 'src/stock/domain/services/stock.service';
+import { Wallet } from '../../domain/entities/wallet.entity'
+import { CreateOrUpdateStockOnWallet } from '../../application/use-cases/CreateOrUpdateStockOnWallet';
+
 @Controller('wallet')
 export class WalletController {
+
   private stock: any;
-  private walletDto: WalletDto;
+  private walletEntity: Wallet;
 
   constructor(
     private readonly walletService: WalletService,
-    private readonly stockService: StockService,
+    private readonly createOrUpdateWallet: CreateOrUpdateStockOnWallet,
   ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('save')
   async create(
-    @Body() walletDtoController: WalletDtoController,
+    @Body() walleDto: WalletDto,
     @CurrentUser() user,
   ): Promise<any> {
-    this.walletDto = new WalletDto();
-    if (user) {
-      this.walletDto.userId = user.id;
-    }
-    if (walletDtoController.symbol) {
-      const stockInput = await this.stockService.getStock({
-        symbol: walletDtoController.symbol,
-      });
-      const walletUser = await this.walletService.getByUser(user.id);
-      let newStocks = [];
-      const userStocks = walletUser?.stocks ?? [];
-      if (userStocks.some((a) => a.stockId.equals(stockInput.id))) {
-
-        newStocks = userStocks.reduce(
-          (acc: WalletDto['stock'], stock) => {
-            if (stock.stockId.equals(stockInput.id)) {
-              acc.push({
-                stockId: stockInput.id,
-                quantity: (Number.isNaN(stock.quantity)? 0 : stock.quantity) + (walletDtoController?.quantity ?? 0),
-                note: walletDtoController.note,
-              });
-            } else {
-              acc.push(stock);
-            }
-            return acc;
-          },
-          [],
-        );
-      } else {
-        newStocks = [
-          ...(walletUser?.stock || []),
-          {
-            stockId: stockInput?.id,
-            quantity: (stockInput?.quantity ?? 0) + walletDtoController?.quantity,
-            note: walletDtoController.note,
-          },
-        ];
-      }
-      return this.walletService.updateOne({
-        query: {
-          userId : user.id,
-        },
-        update: {
-          stock: newStocks,
-        },
-      });
-    }
+    this.createOrUpdateWallet.execute(walleDto, user.id);
   }
   @UseGuards(JwtAuthGuard)
   @Get('getAll')

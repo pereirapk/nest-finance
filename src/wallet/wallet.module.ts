@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { WalletService } from './domain/service/wallet.service';
+import { WalletService } from './domain/services/wallet.service';
 import { DatabaseModule } from 'src/shared/infrastruture/database/database.module';
 import { WalletController } from './infrastruture/controllers/wallet.controller';
 import { StockModule } from 'src/stock/stock.module';

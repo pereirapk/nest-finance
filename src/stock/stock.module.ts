@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { StockService } from './domain/service/stock.service';
+import { StockService } from './domain/services/stock.service';
 import { StockController } from './infracstruture/controllers/stock.controller';
 
 @Module({

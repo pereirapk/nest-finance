@@ -5,10 +5,9 @@ import {
   ConflictException,
   InternalServerErrorException,
   HttpStatus,
-  Req,
 } from '@nestjs/common';
 import { MongoClient, ObjectId } from 'mongodb';
-import { WalletDto } from '../../application/dto/wallet.dto';
+import { Wallet } from '../entities/wallet.entity';
 
 @Injectable()
 export class WalletService {
@@ -20,36 +19,12 @@ export class WalletService {
     this.walletsCollection = this.db.collection('wallets');
   }
 
-  async create(walletDto: WalletDto): Promise<any> {
-    try {
-      const stock = await this.walletsCollection.updateOne(
-        { id_stock: walletDto.stockId, userId: walletDto.userId },
-        { $set: walletDto },
-        { upsert: true },
-      );
-
-      if (stock.acknowledged === false) {
-        throw new ConflictException('Ação não pode ser adicionada na carteira');
-      }
-      return {
-        statusCode: HttpStatus.CREATED,
-        message: 'Ação adicionada a carteira',
-        data: {
-          quantity: walletDto.quantity,
-        },
-      };
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Ação não pode ser adicionada na carteira',
-      );
-    }
-  }
   async updateOne({
     query,
     update,
   }: {
-    query: Partial<WalletDto>;
-    update: Partial<WalletDto>;
+    query: Partial<Wallet>;
+    update: Partial<Wallet>;
   }): Promise<any> {
     const { stockId, quantity, note } = update.stock[0];
     const updateResult = await this.walletsCollection.updateOne(
