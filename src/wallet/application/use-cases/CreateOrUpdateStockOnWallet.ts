@@ -1,13 +1,19 @@
+import { Wallet } from './../../domain/entities/wallet.entity';
 import { WalletDto } from './../dto/wallet.dto';
-import { Wallet } from '../../domain/entities/wallet.entity';
 import { WalletService } from '../../domain/services/wallet.service';
 import { StockService } from '../../../stock/domain/services/stock.service';
 import { ObjectId } from 'mongodb';
+import { Injectable } from '@nestjs/common';
+import { WalletRepositoryInterface } from 'src/wallet/domain/repositories/interfaces/walletRepository.interface';
 
+
+@Injectable()
 export class CreateOrUpdateStockOnWallet {
   constructor(
     private readonly walletService: WalletService,
     private readonly stockService: StockService,
+    private WalletRepository: WalletRepositoryInterface
+
   ) {}
   async execute(WalletDto: WalletDto, userId: ObjectId) {
     if (WalletDto.symbol) {

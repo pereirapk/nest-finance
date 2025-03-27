@@ -1,4 +1,3 @@
-
 import {
   Body,
   Controller,
@@ -13,19 +12,16 @@ import { WalletDto } from '../../application/dto/wallet.dto';
 import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
 import { ObjectId } from 'mongodb';
 import { CurrentUser } from 'src/user/decorator/currentUser.decorator';
-import { StockService } from 'src/stock/domain/services/stock.service';
 import { Wallet } from '../../domain/entities/wallet.entity'
 import { CreateOrUpdateStockOnWallet } from '../../application/use-cases/CreateOrUpdateStockOnWallet';
+import { WalletRepositoryInterface } from 'src/wallet/domain/repositories/interfaces/walletRepository.interface';
 
 @Controller('wallet')
 export class WalletController {
 
-  private stock: any;
-  private walletEntity: Wallet;
-
   constructor(
     private readonly walletService: WalletService,
-    private readonly createOrUpdateWallet: CreateOrUpdateStockOnWallet,
+    private readonly createOrUpdateWallet: CreateOrUpdateStockOnWallet
   ) {}
 
   @UseGuards(JwtAuthGuard)
