@@ -1,3 +1,4 @@
+import { Injectable } from "@nestjs/common";
 import { ObjectId } from "mongodb";
 
 export interface WalletRepositoryInterface {
