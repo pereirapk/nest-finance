@@ -19,7 +19,28 @@ export class MongoService implements OnModuleInit {
 
     this.walletCollection = await this.mongoDb.command({
       collMod: 'wallet',
-      validator: { $jsonSchema: walletSchema },
+      validator: {
+        $jsonSchema: {
+          bsonType: 'object',
+          required: ['id', 'userId', 'stock'],
+          properties: {
+            id: { bsonType: 'objectId' },
+            userId: { bsonType: 'objectId' },
+            stock: {
+              bsonType: 'array',
+              items: {
+                bsonType: 'object',
+                required: ['stockId', 'quantity', 'note'],
+                properties: {
+                  stockId: { bsonType: 'objectId' },
+                  quantity: { bsonType: 'int' },
+                  note: { bsonType: 'double' },
+                },
+              },
+            },
+          },
+        },
+      },
     });
     this.stockCollection = await this.mongoDb.command({
       collMod: 'stock',
