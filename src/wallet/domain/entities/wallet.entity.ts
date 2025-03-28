@@ -1,11 +1,24 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 
-export class Wallet {
-    id: ObjectId;
-    userId: ObjectId;
-    stock: {
-        stockId: ObjectId,
-        quantity: number,
-        note: number
-    }[]
-}
+export const walletSchema = {
+  id: ObjectId,
+  userId: ObjectId,
+  stock: [
+    {
+      stockId: ObjectId,
+      quantity: Number,
+      note: Number,
+    },
+  ],
+};
+
+export type WalletType = typeof walletSchema;
+
+export type SaveInputType = {
+  query: Partial<WalletType>;
+  update: Partial<WalletType>;
+};
+
+export type SaveResonseType = {
+  response: Partial<WalletType>;
+};
