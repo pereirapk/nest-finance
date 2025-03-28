@@ -11,19 +11,17 @@ import {
 import { MongoClient } from 'mongodb';
 import * as bcrypt from 'bcryptjs';
 import { LoginDto } from 'src/shared/auth/dto/login.dto';
+import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
 @Injectable()
 export class UsersService {
   private db;
-  private usersCollection;
+  private userCollection;
 
-  constructor(@Inject('DATABASE_CONNECTION') private client: MongoClient) {
-    this.db = this.client.db('finance');
-    this.usersCollection = this.db.collection('users');
-  }
+  constructor(private readonly mongoDb: MongoService) {}
 
   async create(createUserDto: CreateUserDto): Promise<any> {
-    const existingUser = await this.usersCollection.findOne({
+    const existingUser = await this.userCollection.findOne({
       email: createUserDto.email,
     });
     if (existingUser) {
@@ -32,7 +30,7 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = { ...createUserDto, password: hashedPassword };
     try {
-      const result = await this.usersCollection.insertOne(user);
+      const result = await this.userCollection.insertOne(user);
 
       if (result.acknowledged === false) {
         throw new ConflictException('Usuário não pode ser criado');
@@ -52,7 +50,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<any> {
-    const user = this.usersCollection.findOne({ email });
+    const user = this.userCollection.findOne({ email });
 
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
@@ -79,7 +77,7 @@ export class UsersService {
       UpdatePasswordDto.new_password,
       10,
     );
-    this.usersCollection.updatePassword;
+    this.userCollection.updatePassword;
   }
   async findByLogin({ email, password }: LoginDto): Promise<any> {
     const user = await this.findByEmail(email);
@@ -95,7 +93,7 @@ export class UsersService {
     return rest;
   }
   async delete(email: string): Promise<any> {
-    this.usersCollection.deleteOne({ email });
+    this.userCollection.deleteOne({ email });
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Ação deletada com sucesso',

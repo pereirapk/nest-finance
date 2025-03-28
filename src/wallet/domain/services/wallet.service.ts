@@ -7,27 +7,23 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { MongoClient, ObjectId } from 'mongodb';
-import { Wallet } from '../entities/wallet.entity';
+import { WalletType } from '../entities/wallet.entity';
 
 @Injectable()
 export class WalletService {
   private db;
-  private walletsCollection;
+  private walletCollection;
 
-  constructor(@Inject('DATABASE_CONNECTION') private client: MongoClient) {
-    this.db = this.client.db('finance');
-    this.walletsCollection = this.db.collection('wallets');
-  }
 
   async updateOne({
     query,
     update,
   }: {
-    query: Partial<Wallet>;
-    update: Partial<Wallet>;
+    query: Partial<WalletType>;
+    update: Partial<WalletType>;
   }): Promise<any> {
     const { stockId, quantity, note } = update.stock[0];
-    const updateResult = await this.walletsCollection.updateOne(
+    const updateResult = await this.walletCollection.updateOne(
       {
         userId: query.userId,
         'stocks.stockId': stockId,
@@ -40,13 +36,13 @@ export class WalletService {
       },
     );
     if (updateResult.matchedCount === 0) {
-      const walletExists = await this.walletsCollection.findOne({
+      const walletExists = await this.walletCollection.findOne({
         userId: query.userId,
       });
 
       if (!walletExists) {
         // Cria o documento com a stock inicial
-        await this.walletsCollection.insertOne({
+        await this.walletCollection.insertOne({
           userId: query.userId,
           stocks: [
             {
@@ -58,7 +54,7 @@ export class WalletService {
         });
       } else {
         // Adiciona a nova stock ao array existente
-        await this.walletsCollection.updateOne(
+        await this.walletCollection.updateOne(
           { userId: query.userId },
           {
             $push: {
@@ -71,7 +67,7 @@ export class WalletService {
           },
         );
       }
-      const wallet = this.walletsCollection.findOne({
+      const wallet = this.walletCollection.findOne({
         userId: query.userId,
       });
       return {
@@ -85,21 +81,21 @@ export class WalletService {
     }
   }
   async getBySymbol(symbol: string, userId:ObjectId): Promise<any> {
-    const stock = await this.walletsCollection.findOne({ symbol, userId });
+    const stock = await this.walletCollection.findOne({ symbol, userId });
     if (!stock) {
       throw new NotFoundException('Ação não encontrada');
     }
     return stock;
   }
   async getByUser(userId: ObjectId): Promise<any> {
-    const wallet = await this.walletsCollection.findOne({ userId });
+    const wallet = await this.walletCollection.findOne({ userId });
     if (!wallet) {
       return null;
     }
     return wallet;
   }
   async deleteStockfromWallet(stockId: ObjectId, walletId: ObjectId): Promise<any> {
-      await this.walletsCollection.deleteOne(
+      await this.walletCollection.deleteOne(
         { _id: walletId },
         { $pull: { stocks: { stockId: stockId } } }
       );

@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { WalletRepositoryInterface } from './interfaces/walletRepository.interface';
 import { ObjectId } from 'mongodb';
 import { SaveInputType, SaveResonseType } from '../entities/wallet.entity';
-import { MongoService } from 'src/shared/infrastruture/database/mongo.service';
+import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
 @Injectable()
 export class WalletRepository implements WalletRepositoryInterface {
@@ -12,7 +12,7 @@ export class WalletRepository implements WalletRepositoryInterface {
   async save({ query, update }: SaveInputType): Promise<SaveResonseType> {
     const { stockId, quantity, note } = update.stock[0];
 
-    const updateResult = await this.mongoDb.WalletsCollection.updateOne(
+    const updateResult = await this.mongoDb.WalletCollection.updateOne(
       {
         userId: query.userId,
         'stocks.stockId': stockId,
@@ -26,13 +26,13 @@ export class WalletRepository implements WalletRepositoryInterface {
     );
 
     if (updateResult.matchedCount === 0) {
-      const walletExists = await this.mongoDb.WalletsCollection.findOne({
+      const walletExists = await this.mongoDb.WalletCollection.findOne({
         userId: query.userId,
       });
 
       if (!walletExists) {
         // Cria o documento com a stock inicial
-        await this.mongoDb.WalletsCollection.insertOne({
+        await this.mongoDb.WalletCollection.insertOne({
           userId: query.userId,
           stocks: [
             {
@@ -44,7 +44,7 @@ export class WalletRepository implements WalletRepositoryInterface {
         });
       } else {
         // Adiciona a nova stock ao array existente
-        await this.mongoDb.WalletsCollection.updateOne(
+        await this.mongoDb.WalletCollection.updateOne(
           { userId: query.userId },
           {
             $push: {
@@ -58,7 +58,7 @@ export class WalletRepository implements WalletRepositoryInterface {
         );
       }
 
-      const wallet = this.mongoDb.WalletsCollection.findOne({
+      const wallet = this.mongoDb.WalletCollection.findOne({
         userId: query.userId,
       });
 
@@ -70,7 +70,7 @@ export class WalletRepository implements WalletRepositoryInterface {
     throw new Error('Method not implemented.');
   }
   async getBySymbol(symbol: string, userId: ObjectId): Promise<any> {
-    const stock = await this.mongoDb.WalletsCollection.findOne({
+    const stock = await this.mongoDb.WalletCollection.findOne({
       symbol,
       userId,
     });
@@ -80,7 +80,7 @@ export class WalletRepository implements WalletRepositoryInterface {
     return stock;
   }
   async getByUser(userId: ObjectId): Promise<any> {
-    const wallet = await this.mongoDb.WalletsCollection.findOne({ userId });
+    const wallet = await this.mongoDb.WalletCollection.findOne({ userId });
     if (!wallet) {
       return null;
     }
@@ -90,7 +90,7 @@ export class WalletRepository implements WalletRepositoryInterface {
     stockId: ObjectId,
     walletId: ObjectId,
   ): Promise<any> {
-    await this.mongoDb.WalletsCollection.deleteOne(
+    await this.mongoDb.WalletCollection.deleteOne(
       { _id: walletId },
       { $pull: { stocks: { stockId: stockId } } },
     );

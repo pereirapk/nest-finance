@@ -12,9 +12,7 @@ import { WalletDto } from '../../application/dto/wallet.dto';
 import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
 import { ObjectId } from 'mongodb';
 import { CurrentUser } from 'src/user/decorator/currentUser.decorator';
-import { Wallet } from '../../domain/entities/wallet.entity'
 import { CreateOrUpdateStockOnWallet } from '../../application/use-cases/CreateOrUpdateStockOnWallet';
-import { WalletRepositoryInterface } from 'src/wallet/domain/repositories/interfaces/walletRepository.interface';
 
 @Controller('wallet')
 export class WalletController {

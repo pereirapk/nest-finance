@@ -3,6 +3,7 @@ import axios from 'axios';
 import { MongoClient, ObjectId } from 'mongodb';
 import { StockDto } from '../../application/dto/stock.dto';
 import { NotFoundException } from '@nestjs/common';
+import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
 
 @Injectable()
@@ -10,12 +11,10 @@ export class StockService {
   private readonly apiKey: string = 'KEY'; 
   private readonly apiUrl: string = 'https://www.alphavantage.co/query';
   private db;
-  private stocksCollection;
+  private stockCollection;
 
-  constructor(@Inject('DATABASE_CONNECTION') private client: MongoClient) {
-    this.db = this.client.db('finance');
-    this.stocksCollection = this.db.collection('stocks'); 
-  }
+  constructor(private readonly mongoDb: MongoService) {}
+  
 
   async getStockPrice(symbol: string): Promise<any> {
     try {
@@ -46,7 +45,7 @@ export class StockService {
     }
   }
   async getStock(query:Partial<StockDto>): Promise<any> {
-    const stock = await this.stocksCollection.findOne(query);
+    const stock = await this.mongoDb.StockCollection.findOne(query);
 
     if (!stock) {
       throw new NotFoundException('Ação não encontrada');
@@ -57,7 +56,7 @@ export class StockService {
     try {
 
       /*updateOne {Search, Input, upsert}*/
-      const stock = await this.stocksCollection.updateOne(
+      const stock = await this.mongoDb.StockCollection.updateOne(
         { symbol: stockDto.symbol},
         { $set: stockDto},
         { upsert: true }
@@ -80,7 +79,7 @@ export class StockService {
     }
   };
   async delete(stockId: ObjectId): Promise<any> {
-    this.stocksCollection.deleteOne({ _id: stockId });
+    this.mongoDb.StockCollection.deleteOne({ _id: stockId });
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Ação deletada com sucesso',
