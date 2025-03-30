@@ -1,55 +1,25 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Db, MongoClient } from 'mongodb';
-import { stockSchema } from 'src/stock/domain/entities/stock.entity';
-import { userSchema } from 'src/user/entities/user.entity';
-import { walletSchema } from 'src/wallet/domain/entities/wallet.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Stock, StockDocument } from 'src/stock/domain/entities/stock.schema';
+import { User, UserDocument } from 'src/user/domain/entities/user.schema';
+import { Wallet, WalletDocument } from 'src/wallet/domain/entities/wallet.schema';
+
 
 @Injectable()
 export class MongoService implements OnModuleInit {
-  private connection: MongoClient;
-  private mongoDb: Db;
-  private walletCollection;
-  private stockCollection;
-  private userCollection;
+  
+
+  constructor(
+    @InjectModel(User.name) private userCollection: Model<UserDocument>,
+    @InjectModel(Stock.name) private stockCollection: Model<StockDocument>,
+    @InjectModel(Wallet.name) private walletCollection: Model<WalletDocument>,
+  ) {}
 
   async onModuleInit() {
-    this.connection = await MongoClient.connect(process.env.DB_URL);
+    
     console.log('MongoService initialized');
-    this.mongoDb = this.connection.db('finance');
-
-    this.walletCollection = await this.mongoDb.command({
-      collMod: 'wallet',
-      validator: {
-        $jsonSchema: {
-          bsonType: 'object',
-          required: ['id', 'userId', 'stock'],
-          properties: {
-            id: { bsonType: 'objectId' },
-            userId: { bsonType: 'objectId' },
-            stock: {
-              bsonType: 'array',
-              items: {
-                bsonType: 'object',
-                required: ['stockId', 'quantity', 'note'],
-                properties: {
-                  stockId: { bsonType: 'objectId' },
-                  quantity: { bsonType: 'int' },
-                  note: { bsonType: 'double' },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-    this.stockCollection = await this.mongoDb.command({
-      collMod: 'stock',
-      validator: { $jsonSchema: stockSchema },
-    });
-    this.userCollection = await this.mongoDb.command({
-      collMod: 'user',
-      validator: { $jsonSchema: userSchema },
-    });
+    
   }
 
   public get WalletCollection() {
@@ -59,6 +29,7 @@ export class MongoService implements OnModuleInit {
     return this.stockCollection;
   }
   public get UserCollection() {
+    console.log(this.userCollection);
     return this.userCollection;
   }
 }
