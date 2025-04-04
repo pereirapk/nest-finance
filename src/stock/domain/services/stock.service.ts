@@ -56,12 +56,13 @@ export class StockService {
     try {
 
       /*updateOne {Search, Input, upsert}*/
-      const stock = await this.mongoDb.StockCollection.updateOne(
+      const stock = await this.mongoDb.StockCollection.findOneAndUpdate(
         { symbol: stockDto.symbol},
         { $set: stockDto},
         { upsert: true }
         );
-      if (stock.acknowledged === false) {
+        console.log(stock)
+      if (stock._id === null) {
         throw new ConflictException('Ação não pode ser criada');
       }
       return {

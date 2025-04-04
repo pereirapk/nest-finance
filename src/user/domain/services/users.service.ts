@@ -15,13 +15,10 @@ import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
 @Injectable()
 export class UsersService {
-  private db;
-  private userCollection;
-
   constructor(private readonly mongoDb: MongoService) {}
 
   async create(createUserDto: CreateUserDto): Promise<any> {
-    const existingUser = await this.userCollection.findOne({
+    const existingUser = await this.mongoDb.UserCollection.findOne({
       email: createUserDto.email,
     });
     if (existingUser) {
@@ -30,9 +27,9 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = { ...createUserDto, password: hashedPassword };
     try {
-      const result = await this.userCollection.insertOne(user);
-
-      if (result.acknowledged === false) {
+      const result = await this.mongoDb.UserCollection.create(user);
+      console.log(result)
+      if (result === null) {
         throw new ConflictException('Usuário não pode ser criado');
       }
 
@@ -50,8 +47,9 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<any> {
-    const user = this.userCollection.findOne({ email });
-
+    const user = this.mongoDb.UserCollection.findOne({ email });
+  
+    console.log({ user })
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
@@ -77,7 +75,6 @@ export class UsersService {
       UpdatePasswordDto.new_password,
       10,
     );
-    this.userCollection.updatePassword;
   }
   async findByLogin({ email, password }: LoginDto): Promise<any> {
     const user = await this.findByEmail(email);
@@ -93,7 +90,7 @@ export class UsersService {
     return rest;
   }
   async delete(email: string): Promise<any> {
-    this.userCollection.deleteOne({ email });
+    this.mongoDb.UserCollection.deleteOne({ email });
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Ação deletada com sucesso',

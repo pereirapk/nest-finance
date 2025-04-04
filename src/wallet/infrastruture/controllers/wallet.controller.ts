@@ -10,7 +10,7 @@ import {
 import { WalletService } from '../../domain/services/wallet.service';
 import { WalletDto } from '../../application/dto/wallet.dto';
 import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
-import { ObjectId } from 'mongodb';
+import { ObjectId, Types } from 'mongoose';
 import { CurrentUser } from 'src/user/decorator/currentUser.decorator';
 import { CreateOrUpdateStockOnWallet } from '../../application/use-cases/CreateOrUpdateStockOnWallet';
 
@@ -32,13 +32,13 @@ export class WalletController {
   }
   @UseGuards(JwtAuthGuard)
   @Get('getAll')
-  async findByUserId(@Query('userId') userId: ObjectId): Promise<any> {
+  async findByUserId(@Query('userId') userId: Types.ObjectId): Promise<any> {
     return this.walletService.getByUser(userId);
   }
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Query('id') id: ObjectId): Promise<any> {
-    const walletId = new ObjectId();
+    const walletId = new Types.ObjectId();
     return this.walletService.deleteStockfromWallet(id,walletId);
   }
 

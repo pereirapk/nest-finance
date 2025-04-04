@@ -1,13 +1,10 @@
 import {
   Injectable,
-  Inject,
   NotFoundException,
-  ConflictException,
-  InternalServerErrorException,
   HttpStatus,
 } from '@nestjs/common';
-import { MongoClient, ObjectId } from 'mongodb';
-import { WalletType } from '../entities/wallet.entity';
+import { ObjectId, Types } from 'mongoose';
+import { WalletDocument } from '../entities/wallet.schema';
 
 @Injectable()
 export class WalletService {
@@ -19,8 +16,8 @@ export class WalletService {
     query,
     update,
   }: {
-    query: Partial<WalletType>;
-    update: Partial<WalletType>;
+    query: Partial<WalletDocument>;
+    update: Partial<WalletDocument>;
   }): Promise<any> {
     const { stockId, quantity, note } = update.stock[0];
     const updateResult = await this.walletCollection.updateOne(
@@ -87,14 +84,14 @@ export class WalletService {
     }
     return stock;
   }
-  async getByUser(userId: ObjectId): Promise<any> {
+  async getByUser(userId: Types.ObjectId): Promise<any> {
     const wallet = await this.walletCollection.findOne({ userId });
     if (!wallet) {
       return null;
     }
     return wallet;
   }
-  async deleteStockfromWallet(stockId: ObjectId, walletId: ObjectId): Promise<any> {
+  async deleteStockfromWallet(stockId: ObjectId, walletId: Types.ObjectId): Promise<any> {
       await this.walletCollection.deleteOne(
         { _id: walletId },
         { $pull: { stocks: { stockId: stockId } } }

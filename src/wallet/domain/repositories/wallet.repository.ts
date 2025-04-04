@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import { WalletRepositoryInterface } from './interfaces/walletRepository.interface';
 import { ObjectId } from 'mongodb';
-import { SaveInputType, SaveResonseType } from '../entities/wallet.entity';
+import { SaveInputType, SaveResonseType } from '../entities/wallet.schema';
 import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
 @Injectable()
 export class WalletRepository implements WalletRepositoryInterface {
   constructor(private readonly mongoDb: MongoService) {}
 
-  async save({ query, update }: SaveInputType): Promise<SaveResonseType> {
+  async save({ query, update }: SaveInputType): Promise<any> {
     const { stockId, quantity, note } = update.stock[0];
 
     const updateResult = await this.mongoDb.WalletCollection.updateOne(
@@ -32,7 +32,7 @@ export class WalletRepository implements WalletRepositoryInterface {
 
       if (!walletExists) {
         // Cria o documento com a stock inicial
-        await this.mongoDb.WalletCollection.insertOne({
+        await this.mongoDb.WalletCollection.create({
           userId: query.userId,
           stocks: [
             {
