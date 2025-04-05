@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId, Types } from 'mongoose';
 import { WalletDocument } from '../../entities/wallet.schema';
 export interface WalletRepositoryInterface {
   save({
@@ -9,7 +9,7 @@ export interface WalletRepositoryInterface {
     update: Partial<WalletDocument>;
   }): Promise<any>;
   getStock(): Promise<any>;
-  getBySymbol(symbol: string, userId: ObjectId): Promise<any>;
-  getByUser(userId: ObjectId): Promise<any>;
-  deleteStockfromWallet(stockId: ObjectId, walletId: ObjectId): Promise<any>;
+  getBySymbol(symbol: string, userId: Types.ObjectId): Promise<any>;
+  getByUser(userId: Types.ObjectId): Promise<any>;
+  deleteStockfromWallet(stockId: Types.ObjectId, walletId: Types.ObjectId): Promise<any>;
 }

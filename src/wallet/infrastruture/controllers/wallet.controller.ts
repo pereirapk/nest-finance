@@ -7,19 +7,18 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { WalletService } from '../../domain/services/wallet.service';
 import { WalletDto } from '../../application/dto/wallet.dto';
 import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
 import { ObjectId, Types } from 'mongoose';
 import { CurrentUser } from 'src/user/decorator/currentUser.decorator';
 import { CreateOrUpdateStockOnWallet } from '../../application/use-cases/CreateOrUpdateStockOnWallet';
-
+import { WalletRepository } from 'src/wallet/domain/repositories/wallet.repository';
 @Controller('wallet')
 export class WalletController {
 
   constructor(
-    private readonly walletService: WalletService,
-    private readonly createOrUpdateWallet: CreateOrUpdateStockOnWallet
+    private readonly createOrUpdateWallet: CreateOrUpdateStockOnWallet,
+    private readonly walletService: WalletRepository
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -37,7 +36,7 @@ export class WalletController {
   }
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async delete(@Query('id') id: ObjectId): Promise<any> {
+  async delete(@Query('id') id: Types.ObjectId): Promise<any> {
     const walletId = new Types.ObjectId();
     return this.walletService.deleteStockfromWallet(id,walletId);
   }

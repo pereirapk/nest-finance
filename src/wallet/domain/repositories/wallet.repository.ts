@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import { WalletRepositoryInterface } from './interfaces/walletRepository.interface';
-import { ObjectId } from 'mongodb';
+import { ObjectId, Types } from 'mongoose';
 import { SaveInputType, SaveResonseType } from '../entities/wallet.schema';
 import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
@@ -69,7 +69,7 @@ export class WalletRepository implements WalletRepositoryInterface {
   getStock(): Promise<any> {
     throw new Error('Method not implemented.');
   }
-  async getBySymbol(symbol: string, userId: ObjectId): Promise<any> {
+  async getBySymbol(symbol: string, userId: Types.ObjectId): Promise<any> {
     const stock = await this.mongoDb.WalletCollection.findOne({
       symbol,
       userId,
@@ -79,7 +79,7 @@ export class WalletRepository implements WalletRepositoryInterface {
     }
     return stock;
   }
-  async getByUser(userId: ObjectId): Promise<any> {
+  async getByUser(userId: Types.ObjectId): Promise<any> {
     const wallet = await this.mongoDb.WalletCollection.findOne({ userId });
     if (!wallet) {
       return null;
@@ -87,8 +87,8 @@ export class WalletRepository implements WalletRepositoryInterface {
     return wallet;
   }
   async deleteStockfromWallet(
-    stockId: ObjectId,
-    walletId: ObjectId,
+    stockId: Types.ObjectId,
+    walletId: Types.ObjectId,
   ): Promise<any> {
     await this.mongoDb.WalletCollection.deleteOne(
       { _id: walletId },
