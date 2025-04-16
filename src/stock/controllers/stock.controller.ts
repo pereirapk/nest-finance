@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
-import { StockService } from '../../domain/services/stock.service';
-import { StockDto } from '../../application/dto/stock.dto';
+import { StockService } from '../services/stock.service';
+import { StockDto } from '../dto/stock.dto';
 import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
 
 

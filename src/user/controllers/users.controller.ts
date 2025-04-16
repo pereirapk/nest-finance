@@ -1,13 +1,13 @@
+import { UserRepository } from '../repositories/user.repository';
 import { Controller, Post, Body, Get, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { UsersService } from '../../domain/services/users.service';
-import { CreateUserDto } from '../../application/dto/create-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 
-@Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+@Controller('user')
+export class UserController {
+  constructor(private readonly userRepository: UserRepository) {}
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createUserDto: CreateUserDto) {
-    const user = await this.usersService.create(createUserDto);
+    const user = await this.userRepository.create(createUserDto);
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Usuario criado com sucesso',
@@ -20,6 +20,6 @@ export class UsersController {
 
   @Get(':email')
   async findOne(@Param('email') email: string) {
-    return this.usersService.findByEmail(email);
+    return this.userRepository.findByEmail(email);
   }
 }

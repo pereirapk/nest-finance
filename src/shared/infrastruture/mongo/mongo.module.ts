@@ -3,9 +3,9 @@
 import { Module, Global } from '@nestjs/common';
 import { MongoService } from './mongo.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/user/domain/entities/user.schema';
-import { Stock, StockSchema } from 'src/stock/domain/entities/stock.schema';
-import { Wallet, WalletSchema } from 'src/wallet/domain/entities/wallet.schema';
+import { User, UserSchema } from 'src/user/entities/user.schema';
+import { Stock, StockSchema } from 'src/stock/entities/stock.schema';
+import { Wallet, WalletSchema } from 'src/wallet/entities/wallet.schema';
 @Global()
 @Module({
   imports: [ MongooseModule.forFeature([

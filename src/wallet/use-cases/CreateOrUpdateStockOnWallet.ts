@@ -1,9 +1,9 @@
-import { WalletDto } from './../dto/wallet.dto';
-import { StockService } from '../../../stock/domain/services/stock.service';
+import { WalletDto } from '../dto/wallet.dto';
+import { StockService } from '../../stock/services/stock.service';
 import { ObjectId,Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { WalletDocument } from 'src/wallet/domain/entities/wallet.schema';
-import { WalletRepository } from 'src/wallet/domain/repositories/wallet.repository';
+import { WalletDocument } from 'src/wallet/entities/wallet.schema';
+import { WalletRepository } from 'src/wallet/repositories/wallet.repository';
 @Injectable()
 export class CreateOrUpdateStockOnWallet {
   constructor(
@@ -16,11 +16,11 @@ export class CreateOrUpdateStockOnWallet {
         symbol: WalletDto.symbol,
       });
       const walletUser = await this.walletRepository.getByUser(userId);
-      let newStocks = [];
-      const userStocks = walletUser?.stocks ?? [];
+      let newStock = [];
+      const userStock = walletUser?.stocks ?? [];
 
-      if (userStocks.some((a) => a.stockId.equals(stockInput.id))) {
-        newStocks = userStocks.reduce((acc: WalletDocument['stock'], stock) => {
+      if (userStock.some((a) => a.stockId.equals(stockInput.id))) {
+        newStock = userStock.reduce((acc: WalletDocument['stock'], stock) => {
           if (stock.stockId.equals(stockInput.id)) {
             acc.push({
               stockId: stockInput.id,
@@ -35,7 +35,7 @@ export class CreateOrUpdateStockOnWallet {
           return acc;
         }, []);
       } else {
-        newStocks = [
+        newStock = [
           ...(walletUser?.stock || []),
           {
             stockId: stockInput?.id,
@@ -46,7 +46,7 @@ export class CreateOrUpdateStockOnWallet {
       }
       this.walletRepository.save({
         ...walletUser,
-        stocks: newStocks,
+        stocks: newStock,
       });
       return "ok"
      ;

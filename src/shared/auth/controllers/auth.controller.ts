@@ -1,3 +1,4 @@
+import { UserRepository } from '../../../user/repositories/user.repository';
 import {
   Controller,
   Post,
@@ -6,8 +7,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { CreateUserDto } from '../../../user/application/dto/create-user.dto';
-import { UsersService } from '../../../user/domain/services/users.service';
+import { CreateUserDto } from '../../../user/dto/create-user.dto';
 import { IsPublic } from '../decorators/is-public.decorator';
 
 @IsPublic()
@@ -15,12 +15,12 @@ import { IsPublic } from '../decorators/is-public.decorator';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersService: UsersService,
+    private readonly userRepository: UserRepository,
   ) {}
   @IsPublic()
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return this.userRepository.create(createUserDto);
   }
 
   @Post('login')

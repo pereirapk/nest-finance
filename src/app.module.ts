@@ -8,9 +8,9 @@ import { JwtAuthGuard } from './shared/auth/guards/jwt-auth.guard';
 import { JwtStrategy } from './shared/auth/strategies/jwt.strategy';
 import { MongoModule } from './shared/infrastruture/mongo/mongo.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './user/domain/entities/user.schema';
-import { Stock, StockSchema } from './stock/domain/entities/stock.schema';
-import { Wallet, WalletSchema } from './wallet/domain/entities/wallet.schema';
+import { User, UserSchema } from './user/entities/user.schema';
+import { Stock, StockSchema } from './stock/entities/stock.schema';
+import { Wallet, WalletSchema } from './wallet/entities/wallet.schema';
 
 @Module({
   imports: [

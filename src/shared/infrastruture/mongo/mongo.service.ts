@@ -1,9 +1,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Stock, StockDocument } from 'src/stock/domain/entities/stock.schema';
-import { User, UserDocument } from 'src/user/domain/entities/user.schema';
-import { Wallet, WalletDocument } from 'src/wallet/domain/entities/wallet.schema';
+import { Stock, StockDocument } from 'src/stock/entities/stock.schema';
+import { User, UserDocument } from 'src/user/entities/user.schema';
+import { Wallet, WalletDocument } from 'src/wallet/entities/wallet.schema';
 
 
 @Injectable()

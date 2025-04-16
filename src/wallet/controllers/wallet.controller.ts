@@ -7,12 +7,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { WalletDto } from '../../application/dto/wallet.dto';
+import { WalletDto } from '../dto/wallet.dto';
 import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
-import { ObjectId, Types } from 'mongoose';
+import {  Types } from 'mongoose';
 import { CurrentUser } from 'src/user/decorator/currentUser.decorator';
-import { CreateOrUpdateStockOnWallet } from '../../application/use-cases/CreateOrUpdateStockOnWallet';
-import { WalletRepository } from 'src/wallet/domain/repositories/wallet.repository';
+import { CreateOrUpdateStockOnWallet } from '../use-cases/CreateOrUpdateStockOnWallet';
+import { WalletRepository } from 'src/wallet/repositories/wallet.repository';
 @Controller('wallet')
 export class WalletController {
 

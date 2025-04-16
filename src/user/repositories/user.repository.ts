@@ -1,5 +1,5 @@
-import { CreateUserDto } from '../../application/dto/create-user.dto';
-import { UpdatePasswordDto } from '../../application/dto/update-password.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdatePasswordDto } from '../dto/update-password.dto';
 import {
   Injectable,
   Inject,
@@ -8,13 +8,12 @@ import {
   InternalServerErrorException,
   HttpStatus,
 } from '@nestjs/common';
-import { MongoClient } from 'mongodb';
 import * as bcrypt from 'bcryptjs';
 import { LoginDto } from 'src/shared/auth/dto/login.dto';
 import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
 @Injectable()
-export class UsersService {
+export class UserRepository {
   constructor(private readonly mongoDb: MongoService) {}
 
   async create(createUserDto: CreateUserDto): Promise<any> {

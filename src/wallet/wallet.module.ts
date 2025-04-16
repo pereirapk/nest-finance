@@ -1,16 +1,14 @@
 import { Module } from '@nestjs/common';
-import { WalletService } from './domain/services/wallet.service';
-import { WalletController } from './infrastruture/controllers/wallet.controller';
+import { WalletController } from './controllers/wallet.controller';
 import { StockModule } from 'src/stock/stock.module';
-import { CreateOrUpdateStockOnWallet } from './application/use-cases/CreateOrUpdateStockOnWallet';
+import { CreateOrUpdateStockOnWallet } from './use-cases/CreateOrUpdateStockOnWallet';
 import { MongoModule } from 'src/shared/infrastruture/mongo/mongo.module';
-import { WalletRepository } from './domain/repositories/wallet.repository';
-import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
+import { WalletRepository } from './repositories/wallet.repository';
 
 @Module({
   imports: [MongoModule, StockModule],
   controllers: [WalletController],
-  exports: [WalletService],
-  providers: [WalletService, CreateOrUpdateStockOnWallet, WalletRepository],
+  exports: [WalletRepository],
+  providers: [CreateOrUpdateStockOnWallet, WalletRepository],
 })
 export class WalletModule {}
