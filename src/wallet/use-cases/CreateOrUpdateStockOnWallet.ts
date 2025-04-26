@@ -1,5 +1,5 @@
 import { WalletDto } from '../dto/wallet.dto';
-import { StockService } from '../../stock/services/stock.service';
+import { StockRepository } from '../../stock/repositories/stock.repository';
 import { ObjectId,Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { WalletDocument } from 'src/wallet/entities/wallet.schema';
@@ -7,19 +7,25 @@ import { WalletRepository } from 'src/wallet/repositories/wallet.repository';
 @Injectable()
 export class CreateOrUpdateStockOnWallet {
   constructor(
-    private readonly stockService: StockService,
+    private readonly stockRepository: StockRepository,
     private readonly walletRepository: WalletRepository
   ) {}
   async execute(WalletDto: WalletDto, userId: Types.ObjectId) {
     if (WalletDto.symbol) {
-      const stockInput = await this.stockService.getStock({
+      let stockInput = await this.stockRepository.getStock({
         symbol: WalletDto.symbol,
       });
+      if (stockInput === null) {
+      stockInput = await this.stockRepository.getStockPrice(
+          WalletDto.symbol,
+        );
+      }
+      
       const walletUser = await this.walletRepository.getByUser(userId);
       let newStock = [];
-      const userStock = walletUser?.stocks ?? [];
-
-      if (userStock.some((a) => a.stockId.equals(stockInput.id))) {
+      const userStock = walletUser.stock;
+      if (userStock.some((stock) => stock.stockId.equals(stockInput.id))) {
+        // if has stock in wallet
         newStock = userStock.reduce((acc: WalletDocument['stock'], stock) => {
           if (stock.stockId.equals(stockInput.id)) {
             acc.push({
@@ -35,8 +41,9 @@ export class CreateOrUpdateStockOnWallet {
           return acc;
         }, []);
       } else {
+        // if not has stock in wallet
         newStock = [
-          ...(walletUser?.stock || []),
+          ...(walletUser?.stock),
           {
             stockId: stockInput?.id,
             quantity: (stockInput?.quantity ?? 0) + WalletDto?.quantity,
@@ -44,12 +51,12 @@ export class CreateOrUpdateStockOnWallet {
           },
         ];
       }
-      this.walletRepository.save({
-        ...walletUser,
-        stocks: newStock,
+      return await this.walletRepository.save({
+        query: { ...walletUser },
+        update: { userId: walletUser.userId,
+        stock: newStock},
       });
-      return "ok"
-     ;
+      
     }
   }
 }

@@ -29,7 +29,6 @@ export class MongoService implements OnModuleInit {
     return this.stockCollection;
   }
   public get UserCollection() {
-    console.log(this.userCollection);
     return this.userCollection;
   }
 }

@@ -1,3 +1,4 @@
+import { WalletRepository } from './../../wallet/repositories/wallet.repository';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
 import {
@@ -14,7 +15,8 @@ import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
 @Injectable()
 export class UserRepository {
-  constructor(private readonly mongoDb: MongoService) {}
+  constructor(private readonly mongoDb: MongoService,
+              private readonly walletRepository: WalletRepository) {}
 
   async create(createUserDto: CreateUserDto): Promise<any> {
     const existingUser = await this.mongoDb.UserCollection.findOne({
@@ -27,14 +29,11 @@ export class UserRepository {
     const user = { ...createUserDto, password: hashedPassword };
     try {
       const result = await this.mongoDb.UserCollection.create(user);
-      console.log(result)
       if (result === null) {
         throw new ConflictException('Usuário não pode ser criado');
       }
-
+      this.walletRepository.create(result._id);
       return {
-        statusCode: HttpStatus.CREATED,
-        message: 'Usuário criado com sucesso',
         data: {
           name: user.name,
           email: user.email,
@@ -48,7 +47,6 @@ export class UserRepository {
   async findByEmail(email: string): Promise<any> {
     const user = this.mongoDb.UserCollection.findOne({ email });
   
-    console.log({ user })
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }

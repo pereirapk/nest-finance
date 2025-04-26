@@ -13,6 +13,7 @@ import { AuthController } from './controllers/auth.controller';
         secret: process.env.JWT_SECRET,
         signOptions: {
           expiresIn:process.env.EXPIRES_IN,
+          algorithm: 'HS256'
         },
         global: true,
     }),

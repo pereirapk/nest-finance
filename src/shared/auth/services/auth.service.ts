@@ -28,14 +28,12 @@ export class AuthService {
     };
   }
   private _createToken(user: any): any {
-  const Authorization = this.jwtService.sign(
-    user,
-    {
+
+    const Authorization = this.jwtService.sign(user, {
       secret: process.env.JWT_SECRET,
-      expiresIn:process.env.EXPIRES_IN
+      expiresIn: process.env.EXPIRES_IN || '1d',
     });
     return {
-      expiresIn: process.env.EXPIRESIN,
       Authorization,
     };
   }

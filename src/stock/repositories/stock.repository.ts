@@ -7,8 +7,8 @@ import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
 
 @Injectable()
-export class StockService {
-  private readonly apiKey: string = 'KEY'; 
+export class StockRepository {
+  private readonly apiKey: string = 'SFCDZD4F7GDD7E4B'; 
   private readonly apiUrl: string = 'https://www.alphavantage.co/query';
   private db;
   private stockCollection;
@@ -19,13 +19,13 @@ export class StockService {
   async getStockPrice(symbol: string): Promise<any> {
     try {
       const response = await axios.get(this.apiUrl, {
-        params: {
+        params:{
           function: 'GLOBAL_QUOTE',
           symbol,
           apikey: this.apiKey,
+          datatype: 'json',
         },
       });
-
       const stock = response.data['Global Quote'];
 
       if (!stock) {
@@ -48,7 +48,7 @@ export class StockService {
     const stock = await this.mongoDb.StockCollection.findOne(query);
 
     if (!stock) {
-      throw new NotFoundException('Ação não encontrada');
+      return null;
     }
     return { id: stock._id, ...stock};
   }
@@ -61,7 +61,6 @@ export class StockService {
         { $set: stockDto},
         { upsert: true }
         );
-        console.log(stock)
       if (stock._id === null) {
         throw new ConflictException('Ação não pode ser criada');
       }
@@ -86,5 +85,28 @@ export class StockService {
       message: 'Ação deletada com sucesso',
     }
   }
+  async searchBySymbol(symbol: string): Promise<any> {
+    try {
+      const response = await axios.get(this.apiUrl, {
+        params:{
+          function: 'SYMBOL_SEARCH',
+          keywords: symbol,
+          apikey: this.apiKey,
+        },
+      });
+      const returnAPI = response.data['bestMatches'];
+      console.log(response.data['bestMatches'])
+      if (!returnAPI) {
+        throw new HttpException('Ação não encontrada', HttpStatus.NOT_FOUND);
+      }
 
+      return returnAPI;
+    } catch (error) {
+      throw new HttpException(
+        'Erro ao obter dados da API',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  
 }

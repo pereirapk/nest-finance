@@ -10,45 +10,26 @@ export class WalletRepository implements WalletRepositoryInterface {
   constructor(private readonly mongoDb: MongoService) {}
 
   async save({ query, update }: SaveInputType): Promise<any> {
+    const userId = update.userId;
     const { stockId, quantity, note } = update.stock[0];
-
     const updateResult = await this.mongoDb.WalletCollection.updateOne(
       {
-        userId: query.userId,
-        'stocks.stockId': stockId,
+        userId: userId,
+        'stock.stockId': stockId,
       },
       {
         $set: {
-          'stocks.$.quantity': quantity,
-          'stocks.$.note': note,
+          'stock.$.quantity': quantity,
+          'stock.$.note': note,
         },
       },
     );
-
-    if (updateResult.matchedCount === 0) {
-      const walletExists = await this.mongoDb.WalletCollection.findOne({
-        userId: query.userId,
-      });
-
-      if (!walletExists) {
-        // Cria o documento com a stock inicial
-        await this.mongoDb.WalletCollection.create({
-          userId: query.userId,
-          stocks: [
-            {
-              stockId: stockId,
-              quantity: quantity,
-              note: note,
-            },
-          ],
-        });
-      } else {
-        // Adiciona a nova stock ao array existente
+    if (updateResult.matchedCount === 0 || updateResult.acknowledged === false) {
         await this.mongoDb.WalletCollection.updateOne(
-          { userId: query.userId },
+          { userId: userId },
           {
             $push: {
-              stocks: {
+              stock: {
                 stockId: stockId,
                 quantity: quantity,
                 note: note,
@@ -57,15 +38,18 @@ export class WalletRepository implements WalletRepositoryInterface {
           },
         );
       }
-
-      const wallet = this.mongoDb.WalletCollection.findOne({
-        userId: query.userId,
-      });
-
+      const wallet = await this.getByUser(userId);
       return { response: wallet } as SaveResonseType;
-    }
   }
 
+  async create(userId: Types.ObjectId): Promise<any>{
+    const response = await this.mongoDb.WalletCollection.create({
+      userId: userId,
+      stocks: [
+      ],
+    });
+    return response;
+  }
   getStock(): Promise<any> {
     throw new Error('Method not implemented.');
   }
@@ -80,7 +64,10 @@ export class WalletRepository implements WalletRepositoryInterface {
     return stock;
   }
   async getByUser(userId: Types.ObjectId): Promise<any> {
-    const wallet = await this.mongoDb.WalletCollection.findOne({ userId });
+    const wallet = await this.mongoDb.WalletCollection.findOne({
+      userId: userId,
+    });
+    
     if (!wallet) {
       return null;
     }
@@ -92,7 +79,7 @@ export class WalletRepository implements WalletRepositoryInterface {
   ): Promise<any> {
     await this.mongoDb.WalletCollection.deleteOne(
       { _id: walletId },
-      { $pull: { stocks: { stockId: stockId } } },
+      { $pull: { stock: { stockId: stockId } } },
     );
     return 'ok';
   }

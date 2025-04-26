@@ -22,13 +22,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return true;
     }
     const isAuthorized = await super.canActivate(context);
+
     if (!isAuthorized) {
       throw new UnauthorizedException('Token is invalid or missing');
     }
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-
-    if (!user) {
+    if (!user.id) {
       throw new UnauthorizedException('User is not active');
     }
     return true; 
