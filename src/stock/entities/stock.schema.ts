@@ -19,3 +19,14 @@ export class Stock {
 }
 
 export const StockSchema = SchemaFactory.createForClass(Stock);
+
+export type StockResponseType = {
+  id: string;
+  symbol?: string;
+  price?: number;
+  type?: string;
+  changePercent?: string;
+  _id?: string;
+};
+
+

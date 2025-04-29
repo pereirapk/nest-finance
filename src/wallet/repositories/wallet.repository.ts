@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import { WalletRepositoryInterface } from './interfaces/walletRepository.interface';
 import { ObjectId, Types } from 'mongoose';
-import { SaveInputType, SaveResonseType } from '../entities/wallet.schema';
+import { SaveInputType, SaveResonseType, Wallet } from '../entities/wallet.schema';
 import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
 
 @Injectable()
 export class WalletRepository implements WalletRepositoryInterface {
   constructor(private readonly mongoDb: MongoService) {}
 
-  async save({ query, update }: SaveInputType): Promise<any> {
-    const userId = update.userId;
+  async save({ query, update }: SaveInputType): Promise<SaveResonseType> {
+    const userId = query.userId;
     const { stockId, quantity, note } = update.stock[0];
     const updateResult = await this.mongoDb.WalletCollection.updateOne(
       {
@@ -50,9 +50,7 @@ export class WalletRepository implements WalletRepositoryInterface {
     });
     return response;
   }
-  getStock(): Promise<any> {
-    throw new Error('Method not implemented.');
-  }
+
   async getBySymbol(symbol: string, userId: Types.ObjectId): Promise<any> {
     const stock = await this.mongoDb.WalletCollection.findOne({
       symbol,

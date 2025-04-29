@@ -3,7 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   HttpStatus,
+  NotFoundException,
   Post,
   Query,
   UseGuards,
@@ -12,12 +14,12 @@ import { WalletDto } from '../dto/wallet.dto';
 import { JwtAuthGuard } from 'src/shared/auth/guards/jwt-auth.guard';
 import { Types } from 'mongoose';
 import { CurrentUser } from 'src/user/decorator/currentUser.decorator';
-import { CreateOrUpdateStockOnWallet } from '../use-cases/CreateOrUpdateStockOnWallet';
+import { SaveStockOnWalletUseCase } from '../use-cases/saveStockOnWallet.use-case';
 import { WalletRepository } from 'src/wallet/repositories/wallet.repository';
 @Controller('wallet')
 export class WalletController {
   constructor(
-    private readonly createOrUpdateWallet: CreateOrUpdateStockOnWallet,
+    private readonly saveStockOnWalletUseCase: SaveStockOnWalletUseCase,
     private readonly walletService: WalletRepository,
   ) {}
 
@@ -25,18 +27,14 @@ export class WalletController {
   @Post('save')
   async save(@Body() walleDto: WalletDto, @CurrentUser() user): Promise<any> {
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
-    const response = await this.createOrUpdateWallet.execute(walleDto, user.id);
-    return {
-      statusCode: HttpStatus.CREATED,
-      message: 'Stock update with success',
-      data: {
-        wallet: response.response,
-      },
+    if (!walleDto.symbol) {
+      throw new HttpException('Symbol is required', HttpStatus.BAD_REQUEST);
     }
-    }
-  
+    return await this.saveStockOnWalletUseCase.execute(walleDto, user.id);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('getAll')
   async findByUserId(@CurrentUser() user): Promise<any> {

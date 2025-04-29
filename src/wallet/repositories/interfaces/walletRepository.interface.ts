@@ -1,5 +1,5 @@
-import { ObjectId, Types } from 'mongoose';
-import { WalletDocument } from '../../entities/wallet.schema';
+import { Types } from 'mongoose';
+import { SaveResonseType, WalletDocument } from '../../entities/wallet.schema';
 export interface WalletRepositoryInterface {
   save({
     query,
@@ -7,8 +7,7 @@ export interface WalletRepositoryInterface {
   }: {
     query: Partial<WalletDocument>;
     update: Partial<WalletDocument>;
-  }): Promise<any>;
-  getStock(): Promise<any>;
+  }): Promise<SaveResonseType>;
   getBySymbol(symbol: string, userId: Types.ObjectId): Promise<any>;
   getByUser(userId: Types.ObjectId): Promise<any>;
   deleteStockfromWallet(stockId: Types.ObjectId, walletId: Types.ObjectId): Promise<any>;

@@ -1,17 +1,17 @@
+import { Types } from 'mongoose';
 import { Injectable, Inject, HttpException, HttpStatus, InternalServerErrorException, ConflictException } from '@nestjs/common';
 import axios from 'axios';
 import { MongoClient, ObjectId } from 'mongodb';
 import { StockDto } from '../dto/stock.dto';
 import { NotFoundException } from '@nestjs/common';
 import { MongoService } from 'src/shared/infrastruture/mongo/mongo.service';
+import { StockResponseType } from '../entities/stock.schema';
 
 
 @Injectable()
 export class StockRepository {
   private readonly apiKey: string = 'SFCDZD4F7GDD7E4B'; 
   private readonly apiUrl: string = 'https://www.alphavantage.co/query';
-  private db;
-  private stockCollection;
 
   constructor(private readonly mongoDb: MongoService) {}
   
@@ -54,7 +54,6 @@ export class StockRepository {
   }
   async save(stockDto: StockDto) {
     try {
-
       /*updateOne {Search, Input, upsert}*/
       const stock = await this.mongoDb.StockCollection.findOneAndUpdate(
         { symbol: stockDto.symbol},
@@ -65,21 +64,18 @@ export class StockRepository {
         throw new ConflictException('Ação não pode ser criada');
       }
       return {
-        statusCode: HttpStatus.CREATED,
-        message: 'Ação criada com sucesso',
-        data: {
           id: stock._id,
           symbol: stock.symbol,
           price: stock.price,
           type: stock.type,
-        },
       };
     } catch (error) {
+        console.log(error)
         throw new InternalServerErrorException('Ação não pode ser criada');
     }
   };
-  async delete(stockId: ObjectId): Promise<any> {
-    this.mongoDb.StockCollection.deleteOne({ _id: stockId });
+  async delete(query): Promise<any> {
+    this.mongoDb.StockCollection.deleteOne(query);
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Ação deletada com sucesso',
